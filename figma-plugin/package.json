@@ -1,0 +1,14 @@
+{
+  "name": "illustration-composition-builder-plugin",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.121.0",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2"
+  }
+}

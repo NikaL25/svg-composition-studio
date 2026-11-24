@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Production build
+dist/
+
+# TypeScript info files
+tsconfig.app.tsbuildinfo
+*.tsbuildinfo
+
+# IDE / Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*.8
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker
+.dockerignore
+
+# Fontend framework vscode settings
+.extensions.json
+
+PROJECT_TESTING_GUIDE.md
+PROJECT_TECHNICAL_INTERVIEW.md
+SOURCE_AUDIT.md

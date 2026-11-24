@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    :root { font-family: Inter, Arial, sans-serif; color: #252422; background: #fff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 16px; font-size: 12px; }
+    header { display: flex; align-items: start; justify-content: space-between; margin-bottom: 14px; }
+    h1 { margin: 0; font-size: 16px; letter-spacing: -.03em; }
+    .muted { color: #85817b; font-size: 10px; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; border: 0; border-radius: 6px; padding: 8px 10px; background: #eeeae4; color: #3f3b36; }
+    button.primary { background: #282725; color: white; }
+    button.small { padding: 5px 7px; }
+    .toolbar, .row { display: flex; align-items: center; gap: 6px; }
+    .toolbar { margin-bottom: 10px; }
+    .toolbar button.active { background: #282725; color: #fff; }
+    input, select { border: 1px solid #dedad4; border-radius: 6px; padding: 8px; outline: 0; }
+    input { width: 100%; }
+    .search { margin-bottom: 10px; }
+    .library { height: 385px; overflow: auto; border: 1px solid #e5e1db; border-radius: 7px; }
+    .asset { width: 100%; display: grid; grid-template-columns: 1fr auto; text-align: left; padding: 9px; border-radius: 0; border-bottom: 1px solid #eeeae5; background: #fff; }
+    .asset:hover { background: #f7f4ef; }
+    .asset strong, .asset span { display: block; }
+    .asset strong { font-size: 11px; }
+    .asset span { color: #938d85; font-size: 9px; margin-top: 3px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+    .notice { min-height: 16px; color: #8c857d; font-size: 10px; margin: 8px 0; }
+    .empty { padding: 18px 10px; color: #9d968e; text-align: center; }
+    .format { display: flex; gap: 5px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <header><div><h1>Illustration Builder</h1><div class="muted" id="fileName">Figma library</div></div><button id="close" class="small">×</button></header>
+  <div class="toolbar"><span class="muted">Детализация</span><button data-detail="L" class="active">L</button><button data-detail="S">S</button><button id="scan" class="primary" style="margin-left:auto">Сканировать</button></div>
+  <input class="search" id="search" placeholder="Поиск реальных компонентов" />
+  <div class="library" id="library"><div class="empty">Нажмите «Сканировать», чтобы прочитать библиотеку Figma</div></div>
+  <div class="format"><select id="format"><option value="1080x1080">Квадрат · 1080×1080</option><option value="1080x1350">Портрет · 1080×1350</option><option value="1200x675">Ландшафт · 1200×675</option></select><button id="composition">Новый холст</button></div>
+  <div class="actions"><button id="export">Экспорт выбранного SVG</button><button id="closeBottom">Закрыть</button></div>
+  <div class="notice" id="notice">Геометрия берётся только из реальных узлов текущего Figma-файла.</div>
+  <script>
+    const state = { assets: [], detail: 'L' };
+    const $ = (id) => document.getElementById(id);
+    const send = (message) => parent.postMessage({ pluginMessage: message }, '*');
+    function render() {
+      const query = $('search').value.toLocaleLowerCase();
+      const assets = state.assets.filter((a) => a.detailLevels.includes(state.detail) && a.name.toLocaleLowerCase().includes(query));
+      const library = $('library');
+      library.replaceChildren();
+      if (!assets.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'Ничего не найдено или узлы ещё не просканированы';
+        library.append(empty);
+        return;
+      }
+      assets.forEach((asset) => {
+        const button = document.createElement('button');
+        button.className = 'asset';
+        button.dataset.id = asset.id;
+        const text = document.createElement('span');
+        const name = document.createElement('strong');
+        name.textContent = asset.name;
+        const details = document.createElement('span');
+        details.textContent = `${asset.role === 'background' ? 'Фоновый объект' : 'Главный объект'} · ${asset.width}×${asset.height}`;
+        const add = document.createElement('b');
+        add.textContent = '＋';
+        text.append(name, details);
+        button.append(text, add);
+        button.onclick = () => send({ type: 'add-asset', id: asset.id });
+        library.append(button);
+      });
+    }
+    $('scan').onclick = () => send({ type: 'scan-library' });
+    $('search').oninput = render;
+    document.querySelectorAll('[data-detail]').forEach((button) => button.onclick = () => { state.detail = button.dataset.detail; document.querySelectorAll('[data-detail]').forEach((b) => b.classList.toggle('active', b === button)); render(); });
+    $('composition').onclick = () => { const [width, height] = $('format').value.split('x').map(Number); send({ type: 'create-composition', width, height }); };
+    $('export').onclick = () => send({ type: 'export-svg' });
+    $('close').onclick = $('closeBottom').onclick = () => send({ type: 'close' });
+    window.onmessage = (event) => { const message = event.data.pluginMessage; if (!message) return; if (message.type === 'ready') $('fileName').textContent = message.fileName; if (message.type === 'library') { state.assets = message.assets; render(); $('notice').textContent = `Найдено узлов: ${message.assets.length}`; } if (message.type === 'result' && !message.result.ok) $('notice').textContent = message.result.error; if (message.type === 'export') { if (!message.result.ok) { $('notice').textContent = message.result.error; return; } const a = document.createElement('a'); a.href = 'data:image/svg+xml;base64,' + message.result.base64; a.download = message.result.name; a.click(); $('notice').textContent = 'SVG экспортирован'; } };
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "auditStatus": "partial_audit_complete",
+  "auditedAt": "2026-11-20",
+  "figmaFileKey": "29PzarfRhLkuaeL1etddob",
+  "sourceNodes": {
+    "brief": "26:11438",
+    "componentLibrary": "0:1",
+    "compositionExamples": "25:11069"
+  },
+  "requirements": {
+    "sourceIllustrationsExplicitlyMentioned": 20,
+    "detailVariants": 2,
+    "colorSchemes": 3,
+    "exportFormat": "svg",
+    "mustPreserveVectorGeometry": true
+  },
+  "sections": [
+    {"id":"21:25788","name":"Размер L","width":4799,"height":11051},
+    {"id":"21:25859","name":"Размер S","width":3490,"height":11051},
+    {"id":"26:11084","name":"Вводная информация","width":8726,"height":1540}
+  ],
+  "componentFamilies": [
+    {"name":"Фон","role":"background","detailVariants":["L","S"],"exportVerified":true},
+    {"name":"конфетти","role":"background_or_decoration","exportVerified":false},
+    {"name":"Пазлы","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Книга","role":"composition_object","detailVariants":["L","S"],"exportVerified":true},
+    {"name":"Телефон","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Наушники","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Лампа","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Кошелек","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Ручка","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Папка","role":"composition_object","detailVariants":["L","S"],"exportVerified":false},
+    {"name":"Монета","role":"composition_object","detailVariants":["L","S"],"exportVerified":false}
+  ],
+  "verifiedExports": [
+    {"nodeId":"21:25788","format":"svg","sizeBytes":868994},
+    {"nodeId":"21:29965","name":"Книга","variant":"L","format":"svg","sizeBytes":30455,"nestedSvgAssets":1},
+    {"nodeId":"24:5990","name":"Фон","variant":"S","format":"svg","sizeBytes":4026,"nestedSvgAssets":1},
+    {"nodeId":"24:3810","variant":"S","format":"svg","sizeBytes":29350,"nestedSvgAssets":1}
+  ],
+  "colorRules": {
+    "mainObjects": "colored",
+    "backgroundObjects": "monochrome",
+    "backgroundColorsMayBeUsedInObjects": true,
+    "objectColorsMayBeUsedInBackgrounds": false,
+    "exactPaletteValues": "unknown_pending_batch_read"
+  },
+  "unknowns": [
+    "Полный список SVG по всем объектам и двум детализациям",
+    "Точные значения палитр",
+    "Полный численный z-order и координаты примеров",
+    "Точные названия форматов композиций"
+  ],
+  "accessProblems": [
+    "Figma MCP Starter rate limit reached during follow-up reads",
+    "Local Figma desktop bridge 127.0.0.1:44950 unavailable"
+  ]
+}
