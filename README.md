@@ -2,7 +2,7 @@
 
 **Интеллектуальный веб-конструктор векторных иллюстраций из готовой библиотеки SVG-компонентов.**
 
-🔗 **Live Demo:** [https://example.com](https://example.com) *(демо-стенд приложения)*  
+🔗 **Live Demo:**  https://svg-composition-studio.vercel.app/ *(демо-стенд приложения)*  
 📦 **Репозиторий:** `https://github.com/NikaL25/svg-composition-studio.git`
 
 ---
