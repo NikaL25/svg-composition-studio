@@ -1,3 +1,4 @@
+
 import JSZip from "jszip";
 import { assetFromSvg } from "./svg";
 import type { DetailLevel, LibraryAsset } from "./types";
@@ -7,37 +8,74 @@ function basename(path: string) {
 }
 
 function displayName(path: string) {
-  return basename(path).replace(/\.svg$/i, "").replace(/[-_]/g, " ");
+  return basename(path)
+    .replace(/\.svg$/i, "")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-async function readSvg(file: File, fallbackDetail: DetailLevel) {
+async function readSvg(
+  file: File,
+  fallbackDetail: DetailLevel
+): Promise<LibraryAsset> {
   const sourcePath = file.webkitRelativePath || file.name;
-  return assetFromSvg(displayName(sourcePath), await file.text(), sourcePath, {
-    fallbackDetail,
-    source: "imported",
-  });
+  const svg = await file.text();
+
+  return assetFromSvg(
+    displayName(sourcePath),
+    svg,
+    sourcePath,
+    {
+      fallbackDetail,
+      source: "imported",
+    }
+  );
 }
 
-export async function importFiles(files: FileList | File[], fallbackDetail: DetailLevel = "L") {
+export async function importFiles(
+  files: FileList | File[],
+  fallbackDetail: DetailLevel = "L"
+): Promise<LibraryAsset[]> {
   const assets: LibraryAsset[] = [];
+
   for (const file of Array.from(files)) {
-    if (file.name.toLocaleLowerCase().endsWith(".svg")) {
+    const filename = file.name.toLocaleLowerCase();
+
+    if (filename.endsWith(".svg")) {
       assets.push(await readSvg(file, fallbackDetail));
       continue;
     }
-    if (file.name.toLocaleLowerCase().endsWith(".zip")) {
+
+    if (filename.endsWith(".zip")) {
       const zip = await JSZip.loadAsync(file);
-      for (const [path, entry] of Object.entries(zip.files)) {
-        if (!entry.dir && path.toLocaleLowerCase().endsWith(".svg")) {
+
+      const svgEntries = Object.entries(zip.files).filter(
+        ([path, entry]) =>
+          !entry.dir &&
+          path.toLocaleLowerCase().endsWith(".svg")
+      );
+
+      const imported = await Promise.all(
+        svgEntries.map(async ([path, entry]) => {
           const sourcePath = path.replace(/\\/g, "/");
           const svg = await entry.async("string");
-          assets.push(assetFromSvg(displayName(sourcePath), svg, sourcePath, {
-            fallbackDetail,
-            source: "imported",
-          }));
-        }
-      }
+
+          return assetFromSvg(
+            displayName(sourcePath),
+            svg,
+            sourcePath,
+            {
+              fallbackDetail,
+              source: "imported",
+            }
+          );
+        })
+      );
+
+      assets.push(...imported);
     }
   }
+
   return assets;
 }
